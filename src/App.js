@@ -54,8 +54,53 @@ function Person({ name, balance, handlePersonSelect }) {
   );
 }
 
+function BillSplit({ name }) {
+  return (
+    <div className="box-bill-split min-w-[450px] bg-orange-200 p-6 flex flex-col gap-4 rounded-xl h-fit">
+      <h1 className="uppercase text-2xl font-[600]">
+        SPLIT A BILL WITH {name}
+      </h1>
+      <form className="flex flex-col gap-4">
+        <label>
+          <input
+            type="text"
+            name="text-amount"
+            id="text-amount"
+            placeholder="Bill Amount"
+          />
+        </label>
+        <label>
+          <input
+            type="text"
+            name="text-self-amount"
+            id="text-self-amount"
+            placeholder="Your Expense"
+          />
+        </label>
+        <label>
+          <input
+            type="text"
+            name="text-person-amount"
+            id="text-person-amount"
+            placeholder={`${name}'s Expense`}
+          />
+        </label>
+        <label>
+          Who's Paying?
+          <select className="spaced-input">
+            <option value="me">Me</option>
+            <option value={name}>{name}</option>
+          </select>
+        </label>
+      </form>
+      <button onClick={() => {}}>Split</button>
+    </div>
+  );
+}
+
 function AddPerson({ setPeople, setAddPerson }) {
   const [name, setName] = useState("");
+
   return (
     <div className="box-add-person w-[450px] p-6 bg-orange-200 my-6 rounded-xl">
       <div>
@@ -68,6 +113,7 @@ function AddPerson({ setPeople, setAddPerson }) {
               placeholder="Enter Name"
               value={name}
               onChange={(event) => setName(event.target.value)}
+              className="spaced-input"
             />
           </label>
           <button
@@ -87,38 +133,42 @@ function AddPerson({ setPeople, setAddPerson }) {
 }
 
 function App() {
+  const [person, setPerson] = useState({});
   const [people, setPeople] = useState([...arrPeople]);
   const [addPerson, setAddPerson] = useState(false);
+  const [billSplit, setBillSplit] = useState(false);
 
   function handlePersonSelect(name) {
-    const person = people.find((person) => person.name === name);
-    console.log(person);
+    setPerson(people.find((person) => person.name === name));
+    setBillSplit(true);
   }
 
   return (
-    <div className="container">
+    <div className="container flex gap-6">
       {/* The list of people */}
-      <div className="box-people flex flex-col gap-6">
-        {people.map((person, index) => (
-          <Person
-            name={person.name}
-            balance={person.balance}
-            handlePersonSelect={handlePersonSelect}
-            key={index + 1}
-          />
-        ))}
-        <button onClick={() => setAddPerson((current) => !current)}>
-          Add Person
-        </button>
+      <div>
+        <div className="box-people flex flex-col gap-6">
+          {people.map((person, index) => (
+            <Person
+              name={person.name}
+              balance={person.balance}
+              handlePersonSelect={handlePersonSelect}
+              key={index + 1}
+            />
+          ))}
+          <button onClick={() => setAddPerson((current) => !current)}>
+            Add Person
+          </button>
+        </div>
+        {/* The add person box */}
+        {addPerson ? (
+          <AddPerson setPeople={setPeople} setAddPerson={setAddPerson} />
+        ) : (
+          ``
+        )}
       </div>
-      {/* The add person box */}
-      {addPerson ? (
-        <AddPerson setPeople={setPeople} setAddPerson={setAddPerson} />
-      ) : (
-        ``
-      )}
       {/* The main bill split box */}
-      <div className="box-bill-split"></div>
+      {billSplit ? <BillSplit name={person.name} /> : ``}
     </div>
   );
 }
