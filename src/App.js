@@ -36,7 +36,7 @@ function Person({ name, balance, handlePersonSelect }) {
             </p>
           ) : (
             <p className="text-[16px] font-[500] text-red-500">
-              You owe ${balance} to {name}
+              You owe ${Math.abs(balance)} to {name}
             </p>
           )
         ) : (
@@ -54,7 +54,11 @@ function Person({ name, balance, handlePersonSelect }) {
   );
 }
 
-function BillSplit({ name }) {
+function BillSplit({ name, handleSplit }) {
+  const [bill, setBill] = useState(null);
+  const [selfExpense, setSelf] = useState(null);
+  const [personExpense, setPerson] = useState(null);
+  const [payee, setPayee] = useState("me");
   return (
     <div className="box-bill-split min-w-[450px] bg-orange-200 p-6 flex flex-col gap-4 rounded-xl h-fit">
       <h1 className="uppercase text-2xl font-[600]">
@@ -67,6 +71,7 @@ function BillSplit({ name }) {
             name="text-amount"
             id="text-amount"
             placeholder="Bill Amount"
+            onChange={(event) => setBill(Number(event.target.value))}
           />
         </label>
         <label>
@@ -75,6 +80,7 @@ function BillSplit({ name }) {
             name="text-self-amount"
             id="text-self-amount"
             placeholder="Your Expense"
+            onChange={(event) => setSelf(Number(event.target.value))}
           />
         </label>
         <label>
@@ -83,17 +89,28 @@ function BillSplit({ name }) {
             name="text-person-amount"
             id="text-person-amount"
             placeholder={`${name}'s Expense`}
+            onChange={(event) => setPerson(Number(event.target.value))}
           />
         </label>
         <label>
           Who's Paying?
-          <select className="spaced-input">
+          <select
+            className="spaced-input"
+            value={payee}
+            onChange={(event) => setPayee(event.target.value)}
+          >
             <option value="me">Me</option>
             <option value={name}>{name}</option>
           </select>
         </label>
       </form>
-      <button onClick={() => {}}>Split</button>
+      <button
+        onClick={() => {
+          handleSplit(bill, selfExpense, personExpense, payee);
+        }}
+      >
+        Split
+      </button>
     </div>
   );
 }
@@ -143,6 +160,27 @@ function App() {
     setBillSplit(true);
   }
 
+  function handleSplit(amount, selfExpense, personExpense, payee) {
+    if (selfExpense + personExpense !== amount) {
+      alert("There's a mismatch between the expenses, try again");
+      return;
+    }
+
+    const balanceChange = payee === "me" ? personExpense : -selfExpense;
+    setPeople((currentPeople) =>
+      currentPeople.map((currentPerson) =>
+        currentPerson.name === person.name
+          ? {
+              ...currentPerson,
+              balance: (currentPerson.balance ?? 0) + balanceChange,
+            }
+          : currentPerson,
+      ),
+    );
+
+    setBillSplit(false);
+  }
+
   return (
     <div className="container flex gap-6">
       {/* The list of people */}
@@ -168,7 +206,11 @@ function App() {
         )}
       </div>
       {/* The main bill split box */}
-      {billSplit ? <BillSplit name={person.name} /> : ``}
+      {billSplit ? (
+        <BillSplit name={person.name} handleSplit={handleSplit} />
+      ) : (
+        ``
+      )}
     </div>
   );
 }
