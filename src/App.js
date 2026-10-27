@@ -2,19 +2,19 @@ import { useState } from "react";
 
 const arrPeople = [
   {
-    name: "Daim",
+    name: "Harry",
     balance: -300,
   },
   {
-    name: "Maryam",
+    name: "Brian",
     balance: -100,
   },
   {
-    name: "Talal",
+    name: "Sarah",
     balance: 200,
   },
   {
-    name: "Shehla",
+    name: "Jill",
     balance: -500,
   },
 ];
